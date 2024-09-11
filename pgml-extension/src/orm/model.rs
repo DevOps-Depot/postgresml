@@ -793,7 +793,7 @@ impl Model {
         let signal_id = unsafe {
             signal_hook::low_level::register(signal_hook::consts::SIGTERM, || {
                 // There can be no memory allocations here.
-                handle_interrupts();
+                Self::handle_interrupts();
             })
         }
         .unwrap();
