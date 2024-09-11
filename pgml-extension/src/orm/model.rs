@@ -774,6 +774,14 @@ impl Model {
         self.metrics.as_ref().unwrap().0.get("r2").unwrap().as_f64().unwrap() as f32
     }
 
+    fn handle_interrupts() {
+        unsafe {
+            if pg_sys::InterruptPending != 0 {
+                pg_sys::ProcessInterrupts(file!().as_ptr() as *const u8 as *const i8, line!() as i32);
+            }
+        }
+    }
+
     fn fit(&mut self, dataset: &Dataset) {
         // Sometimes our algorithms take a long time. The only way to stop code
         // that we don't have control over is using a signal handler. Signal handlers
@@ -785,7 +793,7 @@ impl Model {
         let signal_id = unsafe {
             signal_hook::low_level::register(signal_hook::consts::SIGTERM, || {
                 // There can be no memory allocations here.
-                check_for_interrupts!(file!().as_ptr() as *const i8, line!() as i32);
+                handle_interrupts();
             })
         }
         .unwrap();
