@@ -5,6 +5,14 @@ fn main() {
         println!("cargo:rustc-link-search=/opt/homebrew/opt/libomp/lib");
     }
 
+
+    #[cfg(target_os = "linux")]
+    {
+        // Ensure that libpostgres.so is linked with the Rust extension
+        println!("cargo:rustc-link-lib=dylib=postgres");
+        println!("cargo:rustc-link-search=native=/usr/local/cloudberry-db/lib");
+    }
+
     // PostgreSQL is using dlopen(RTLD_GLOBAL). this will parse some
     // of symbols into the previous opened .so file, but the others will use a
     // relative offset in pgml.so, and will cause a null-pointer crash.
